@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Project Arbitrage Treasury Console"
+description = "An auditable corporate treasury command center that visualizes Hindsight memory, executive risk drift, market trauma, balance history, and before-and-after shock decisions."
+version = "1.0.0"
+id = "artifacts/project-arbitrage"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18113
+
+[services.development]
+run = "pnpm --filter @workspace/project-arbitrage run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/project-arbitrage", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/project-arbitrage/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18113"
+BASE_PATH = "/"

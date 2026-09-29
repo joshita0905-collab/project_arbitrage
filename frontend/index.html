@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Arbitrage | Treasury Risk Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css?v=3" />
+  </head>
+  <body>
+    <main id="login-screen" class="login-screen">
+      <section class="login-panel" aria-labelledby="login-title">
+        <div class="login-brand">
+          <span class="brand-mark" aria-hidden="true">PA</span>
+          <div>
+            <p class="eyebrow">Enterprise Treasury Intelligence</p>
+            <h1 id="login-title">Project Arbitrage</h1>
+          </div>
+        </div>
+        <p class="login-tagline">The Long-Memory Treasury Risk Agent for Global Enterprise.</p>
+        <p class="login-copy">Sign in to access live market data, your treasury inputs, and Hindsight-backed decision support.</p>
+        <form id="login-form" class="decision-form login-form">
+          <label>Corporate ID<input id="login-id" name="corporate_id" type="email" autocomplete="username" required /></label>
+          <label>Password<input id="login-password" name="password" type="password" autocomplete="current-password" required /></label>
+          <p id="login-error" class="login-error" role="alert" hidden>Corporate ID or password is incorrect.</p>
+          <button type="submit" class="primary">Sign In</button>
+        </form>
+        <div class="login-footer">
+          <span class="demo-indicator"><span></span>Demo Environment</span>
+          <span>Demo ID: demo@arbitrage.com · Password: demo123</span>
+        </div>
+        <p class="login-disclaimer">Local demonstration sign-in only. This is not production authentication.</p>
+      </section>
+    </main>
+
+    <div id="dashboard-shell" class="page-shell" hidden>
+      <header class="topbar">
+        <div>
+          <p id="greeting" class="eyebrow">Welcome</p>
+          <h1>Project Arbitrage</h1>
+        </div>
+        <nav class="app-nav" aria-label="Main navigation">
+          <button type="button" class="nav-link active" data-view="dashboard" aria-current="page">Dashboard</button>
+          <button type="button" class="nav-link" data-scroll="dashboard-market">Market</button>
+          <button type="button" class="nav-link" data-view="memory">Memory</button>
+          <button type="button" class="nav-link" data-view="history">History</button>
+          <button type="button" class="nav-link" data-scroll="dashboard-inputs">Settings</button>
+        </nav>
+        <time id="local-date-time" class="local-date-time"></time>
+        <div class="header-status">
+          <span class="demo-session">Live inputs · Human review required</span>
+          <button id="sign-out" type="button" class="secondary">Sign out</button>
+          <div id="health-pill" class="status-pill loading">Checking live backend...</div>
+        </div>
+      </header>
+
+      <p id="request-status" class="request-status" role="status" aria-live="polite" data-state="loading">Connecting to Project Arbitrage...</p>
+      <section class="source-strip" aria-label="Live source status">
+        <span id="market-source-status">Market data: checking</span>
+        <span id="hindsight-source-status">Hindsight: checking</span>
+        <span id="ai-source-status">AI reasoning: checking</span>
+        <span id="last-updated">Last updated: --</span>
+      </section>
+
+      <main class="dashboard">
+        <section class="hero card dashboard-market">
+          <div>
+            <div class="hero-title-line">
+              <p class="section-tag">Current live FX market</p>
+              <button id="refresh-assessment" type="button" class="secondary">Refresh assessment</button>
+            </div>
+            <h2 id="shock-scenario">Loading scenario...</h2>
+            <p id="shock-note" class="muted"></p>
+          </div>
+          <div class="hero-metrics">
+            <div>
+              <span>Currency pair</span>
+              <strong id="shock-currency">--</strong>
+            </div>
+            <div>
+              <span>Move</span>
+              <strong id="shock-move">--</strong>
+            </div>
+            <div>
+              <span>Reference rate</span>
+              <strong id="shock-rate">--</strong>
+            </div>
+          </div>
+        </section>
+
+        <p id="risk-calculation" class="request-status calculation-detail dashboard-calculation" data-state="loading">Risk calculation will be shown after live inputs are available.</p>
+
+        <section class="summary-grid dashboard-summary">
+          <article class="card metric-card risk">
+            <span class="label">Risk level</span>
+            <strong id="risk-level">--</strong>
+            <small id="risk-recommendation">--</small>
+          </article>
+          <article class="card metric-card score">
+            <span class="label">Risk score</span>
+            <strong id="risk-score">--</strong>
+            <small id="risk-score-scale">0-100</small>
+          </article>
+          <article class="card metric-card policy">
+            <span class="label">Policy status</span>
+            <strong id="policy-status">--</strong>
+            <small id="guardrail-status">--</small>
+          </article>
+          <article class="card metric-card approval">
+            <span class="label">Approval</span>
+            <strong id="approval-state">--</strong>
+            <small id="approval-note">--</small>
+          </article>
+        </section>
+
+        <section class="two-col input-section dashboard-inputs">
+          <article class="card">
+            <div class="panel-header">
+              <h3>Exposure inputs</h3>
+              <span class="muted">Saved to this backend</span>
+            </div>
+            <div id="exposure-input-list" class="table-stack"></div>
+            <form id="exposure-form" class="decision-form">
+              <label>Entity<input id="exposure-entity" name="entity" required maxlength="120" /></label>
+              <div class="form-row">
+                <label>Currency<input id="exposure-currency" name="currency" required pattern="[A-Za-z]{3}" maxlength="3" /></label>
+                <label>Amount<input id="exposure-amount" name="amount" type="number" min="0.000001" step="0.000001" required /></label>
+              </div>
+              <div class="form-row">
+                <label>Maturity (days)<input id="exposure-maturity" name="maturity_days" type="number" min="0" max="3650" step="1" required /></label>
+                <label>Hedged (%)<input id="exposure-hedged" name="hedged_pct" type="number" min="0" max="100" step="0.001" required /></label>
+              </div>
+              <button type="submit" class="secondary">Save exposure</button>
+            </form>
+          </article>
+
+          <article class="card">
+            <div class="panel-header">
+              <h3>Policy inputs</h3>
+              <span class="muted">No defaults are preloaded</span>
+            </div>
+            <div id="policy-input-list" class="list-stack"></div>
+            <form id="policy-form" class="decision-form">
+              <label>Policy name<input id="policy-name" name="name" required maxlength="120" /></label>
+              <div class="form-row">
+                <label>Category<select id="policy-category" name="category"><option value="fx">FX move (%)</option><option value="hedge">Hedge coverage (%)</option><option value="exposure">Exposure amount</option></select></label>
+                <label>Threshold<input id="policy-threshold" name="threshold" type="number" min="0.000001" step="0.000001" required /></label>
+              </div>
+              <div class="form-row">
+                <label>Severity<select id="policy-severity" name="severity" required><option value="" selected disabled>Select severity</option><option>low</option><option>medium</option><option>high</option><option>critical</option></select></label>
+                <label class="checkbox-label"><input id="policy-escalation" name="require_human_escalation" type="checkbox" /> Require human escalation</label>
+              </div>
+              <label>Description<input id="policy-description" name="description" maxlength="500" /></label>
+              <button type="submit" class="secondary">Save policy</button>
+            </form>
+          </article>
+        </section>
+
+        <section class="two-col dashboard-portfolio">
+          <article class="card">
+            <div class="panel-header">
+              <h3>Corporate exposure</h3>
+            </div>
+            <div id="exposures-list" class="table-stack"></div>
+          </article>
+
+          <article class="card">
+            <div class="panel-header">
+              <h3>Policy thresholds</h3>
+            </div>
+            <div id="policies-list" class="list-stack"></div>
+          </article>
+        </section>
+
+        <section class="two-col dashboard-memory">
+          <article class="card">
+            <div class="panel-header">
+              <h3>Official Hindsight recall</h3>
+            </div>
+            <div id="memory-list" class="list-stack"></div>
+          </article>
+
+          <article class="card">
+            <div class="panel-header">
+              <h3>Precedent + guardrails</h3>
+            </div>
+            <div id="guardrail-box" class="plain-block"></div>
+          </article>
+        </section>
+
+        <section class="two-col dashboard-agent">
+          <article class="card large">
+            <div class="panel-header">
+              <h3>Executive assessment</h3>
+            </div>
+            <p id="executive-summary" class="summary-copy"></p>
+          </article>
+
+          <article class="card large">
+            <div class="panel-header">
+              <h3>Proposed protective actions</h3>
+            </div>
+            <ul id="proposed-actions" class="check-list"></ul>
+          </article>
+        </section>
+
+        <section class="dashboard-recent">
+          <div class="panel-header">
+            <h3>Recent treasury records</h3>
+            <button type="button" class="secondary" data-view="history">View all history</button>
+          </div>
+          <div id="dashboard-record-stats" class="record-stats"></div>
+          <div id="recent-records" class="recent-records"></div>
+        </section>
+
+        <section class="two-col dashboard-audit">
+          <article class="card">
+            <div class="panel-header">
+              <h3>Decision & audit history</h3>
+            </div>
+            <div id="audit-list" class="list-stack compact"></div>
+          </article>
+
+          <article class="card">
+            <div class="panel-header">
+              <h3>Human approval</h3>
+            </div>
+            <form id="decision-form" class="decision-form">
+              <label>
+                Decision
+                <select id="decision-select">
+                  <option value="" selected disabled>Select decision</option>
+                  <option value="APPROVE">APPROVE</option>
+                  <option value="REJECT">REJECT</option>
+                  <option value="ESCALATE">ESCALATE</option>
+                </select>
+              </label>
+              <label>
+                Rationale
+                <textarea id="decision-rationale" rows="3" required maxlength="2000"></textarea>
+              </label>
+              <label>
+                Notes
+                <textarea id="decision-notes" rows="3" maxlength="4000"></textarea>
+              </label>
+              <button type="submit" class="primary" disabled>Submit decision</button>
+            </form>
+            <form id="simulate-action-form" class="decision-form simulate-action-form" hidden>
+              <label>Simulated protective action<input id="simulated-action-description" name="action" required maxlength="2000" /></label>
+              <button type="submit" class="secondary">Simulate approved action</button>
+              <p class="simulation-warning">SIMULATION ONLY · NO REAL FUNDS MOVED</p>
+            </form>
+            <div id="simulated-action-result" class="plain-block" hidden></div>
+          </article>
+        </section>
+      </main>
+
+      <section id="history-view" class="content-view" hidden>
+        <div class="view-heading">
+          <div>
+            <p class="section-tag">Persistent treasury cycles</p>
+            <h2>History</h2>
+          </div>
+          <span id="history-count" class="muted">--</span>
+        </div>
+        <div id="history-empty" class="empty-state" hidden>
+          <strong>No treasury records yet</strong>
+          <p>Complete a market assessment and submit a decision to create the first organizational memory.</p>
+        </div>
+        <div id="history-table-wrap" class="history-table-wrap" hidden>
+          <table class="history-table">
+            <thead><tr><th>Date</th><th>Event</th><th>Currency</th><th>Market movement</th><th>Risk</th><th>Agent action</th><th>Outcome</th><th>Hindsight</th></tr></thead>
+            <tbody id="history-rows"></tbody>
+          </table>
+        </div>
+        <section id="record-detail" class="record-detail" hidden aria-live="polite"></section>
+      </section>
+
+      <section id="memory-view" class="content-view" hidden>
+        <div class="view-heading">
+          <div>
+            <p class="section-tag">Vectorize Hindsight</p>
+            <h2>Organizational memory</h2>
+          </div>
+          <button id="refresh-memory" type="button" class="secondary">Refresh memory</button>
+        </div>
+        <div id="memory-stats" class="record-stats"></div>
+        <p id="memory-view-status" class="request-status" role="status" data-state="loading">Loading Hindsight memory...</p>
+        <div id="memory-timeline" class="memory-timeline"></div>
+      </section>
+    </div>
+
+    <script src="config.js?v=2"></script>
+    <script src="app.js?v=5"></script>
+  </body>
+</html>

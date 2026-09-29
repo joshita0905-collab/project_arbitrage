@@ -1,0 +1,290 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: arbitrage
+    description: Project Arbitrage treasury intelligence
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /arbitrage/dashboard:
+    get:
+      operationId: getArbitrageDashboard
+      tags: [arbitrage]
+      summary: Get the treasury dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArbitrageDashboard"
+  /arbitrage/memory:
+    get:
+      operationId: getArbitrageMemory
+      tags: [arbitrage]
+      summary: Get the Hindsight memory graph nodes
+      responses:
+        "200":
+          description: Typed memory graph nodes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MemoryNode"
+  /arbitrage/timeline:
+    get:
+      operationId: getArbitrageTimeline
+      tags: [arbitrage]
+      summary: Get the compressed six-month session timeline
+      responses:
+        "200":
+          description: Historical treasury sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimelineSession"
+  /arbitrage/evaluate:
+    post:
+      operationId: evaluateArbitrageShock
+      tags: [arbitrage]
+      summary: Evaluate a live treasury shock with and without Hindsight
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShockInput"
+      responses:
+        "200":
+          description: Before and after treasury decisions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArbitrageEvaluation"
+        "400":
+          description: Invalid shock input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ArbitrageDashboard:
+      type: object
+      required:
+        - status
+        - totalNodes
+        - beliefDrift
+        - riskTolerance
+        - hedgingThreshold
+        - baselineLoss
+        - mitigatedLoss
+        - activeExposure
+        - lastDecision
+      properties:
+        status:
+          type: string
+        totalNodes:
+          type: integer
+        beliefDrift:
+          type: number
+        riskTolerance:
+          type: number
+        hedgingThreshold:
+          type: number
+        baselineLoss:
+          type: number
+        mitigatedLoss:
+          type: number
+        activeExposure:
+          type: number
+        lastDecision:
+          type: string
+    MemoryNode:
+      type: object
+      required:
+        - id
+        - day
+        - session
+        - kind
+        - title
+        - detail
+        - tone
+        - value
+      properties:
+        id:
+          type: string
+        day:
+          type: integer
+        session:
+          type: string
+        kind:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        tone:
+          type: string
+        value:
+          type: number
+    TimelineSession:
+      type: object
+      required:
+        - day
+        - label
+        - title
+        - description
+        - kind
+        - status
+      properties:
+        day:
+          type: integer
+        label:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        kind:
+          type: string
+        status:
+          type: string
+    ShockInput:
+      type: object
+      required:
+        - eventName
+        - currencyMove
+        - interestRateMoveBps
+      properties:
+        eventName:
+          type: string
+          minLength: 1
+        currencyMove:
+          type: number
+        interestRateMoveBps:
+          type: integer
+        currency:
+          type: string
+          default: EUR
+    Decision:
+      type: object
+      required:
+        - summary
+        - action
+        - loss
+        - tone
+        - references
+      properties:
+        summary:
+          type: string
+        action:
+          type: string
+        loss:
+          type: number
+        tone:
+          type: string
+        references:
+          type: array
+          items:
+            type: string
+    ArbitrageEvaluation:
+      type: object
+      required:
+        - shock
+        - baseline
+        - hindsight
+        - saved
+        - execution
+        - systemState
+        - transactionFrozen
+        - telemetry
+        - temporalWeights
+        - varianceIndex
+      properties:
+        shock:
+          $ref: "#/components/schemas/ShockInput"
+        baseline:
+          $ref: "#/components/schemas/Decision"
+        hindsight:
+          $ref: "#/components/schemas/Decision"
+        saved:
+          type: number
+        execution:
+          type: array
+          items:
+            type: string
+        systemState:
+          type: string
+        transactionFrozen:
+          type: boolean
+        telemetry:
+          type: array
+          items:
+            type: string
+        temporalWeights:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemporalWeight"
+        varianceIndex:
+          type: number
+    TemporalWeight:
+      type: object
+      required:
+        - observationId
+        - kind
+        - observedDay
+        - freshness
+        - initialConfidence
+        - importance
+      properties:
+        observationId:
+          type: string
+        kind:
+          type: string
+        observedDay:
+          type: integer
+        freshness:
+          type: number
+        initialConfidence:
+          type: number
+        importance:
+          type: number
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+

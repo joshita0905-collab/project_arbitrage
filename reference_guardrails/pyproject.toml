@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project-arbitrage"
+version = "0.1.0"
+description = "Auditable treasury decisions backed by a Hindsight-style temporal memory ledger."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+project-arbitrage-demo = "project_arbitrage.treasury_core:run_demo"
+
+[tool.setuptools.packages.find]
+include = ["project_arbitrage*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
